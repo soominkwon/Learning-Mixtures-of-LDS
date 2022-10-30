@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Oct 20 19:32:14 2022
+
+@author: soominkwon
+"""
+
 import numpy as np
 from scipy import linalg
 
@@ -28,7 +36,7 @@ def generate_models(d, K, rho):
         
         # generate W matrix
         U = linalg.orth(np.random.randn(d, d))
-        L = np.diag((1.0 + np.random.randn(d, )).squeeze())
+        L = np.diag((1.0 + np.random.uniform(0, 1, (d, ))).squeeze())
         
         # eigendecomposition of W
         W = U @ L @ U.T
@@ -163,20 +171,20 @@ def generate_mixed_lds(As, Whalfs, true_labels, Ts):
 
         # updating trajectory
         data.append(traj)
-        x0 = traj[:, T_m]
+        x0 = traj[:, T_m-1]        
 
     return data
 
 
 if __name__ == "__main__":
     # initializing parameters
-    d   = 30
+    d   = 80
     K   = 4
     rho = 0.5
     
     Msubspace        = 30  * d
     Mclustering      = 10  * d
-    Mclassification  = 50 * d
+    Mclassification  = 5000 * d
     M = Msubspace + Mclustering + Mclassification
     
     Tsubspace        = 20
