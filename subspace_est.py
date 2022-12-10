@@ -2,14 +2,16 @@ import numpy as np
 from scipy import linalg
 
 def subspace_estimation_helper(data_sub_est):
-    """
-    Function used to estimate the subspaces.
-    
-    Parameters:
-        data_sub_est: Dataset for subspace estimation with dims (M,d,T+1)
 
-    Returns:
-        H_i, G_i:     Eigenspaces each with dimensions (d,d,d)
+    """
+    Input: data_sub_est as a (M,d,T+1) tensor
+    where M is the number of trajectories
+    T is the trajectory length
+    Tp1 = T+1
+    d is the dimension of the data
+
+    Output: d (d times d) matrices H_i and G_i whose top K eigenspace we want
+    Returned as 2 (d,d,d) numpy arrays
     """
     
     # Set up data matrix X and dimensions
@@ -50,13 +52,14 @@ def subspace_estimation_helper(data_sub_est):
     
 def subspace_estimation(data_sub_est, K):
     """
-    Function to perform subspace estimation using helper function.
-    
-    Parameters:
-        data_sub_est: Dataset for subspace estimation with dims (M,d,T+1)
+    Input: data_sub_est as a (M,d,T+1) tensor
+    where M is the number of trajectories
+    T is the trajectory length
+    Tp1 = T+1
+    d is the dimension of the data
 
-    Returns:
-        V_i, U_i:     Orthogonal projectors to the desired subspaces with dims (d,d,K)
+    Output: d (d times K) matrices V_i and U_i which are orthogonal projectors to the desired subspaces
+    Returned as 2 (d,d,K) numpy arrays
     """
     
     H_i, G_i = subspace_estimation_helper(data_sub_est)
@@ -70,7 +73,10 @@ def subspace_estimation(data_sub_est, K):
     
     # Get eigenvectors
     for i in range(d):
-        V_i[i, :, :] = linalg.svd(H_i[i, :, :])[0][:,:K]
-        U_i[i,:,:] = linalg.svd(G_i[i,:,:])[0][:,:K]
+        eigvals, V_i[i, :, :] = linalg.eigh(H_i[i, :, :], subset_by_index = [d-K, d-1])
+        eigvals, U_i[i,:,:] = linalg.eigh(G_i[i,:,:], subset_by_index = [d-K, d-1])
 
     return V_i, U_i
+
+    
+    
